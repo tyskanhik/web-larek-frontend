@@ -40,3 +40,20 @@ npm run build
 ```
 yarn build
 ```
+
+## Описание типов
+
+```typescript
+/**
+ * Интерфейс продукта поторый приходит с сервера
+*/
+interface IProduct {
+    id: string;
+    description: string;
+    image: string;
+    title: string;
+    category: category;
+    price: price;
+}
+
+```
