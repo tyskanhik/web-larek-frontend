@@ -129,6 +129,28 @@ type FormErrors = Partial<Record<keyof IOrder, string>>;
 interface IOrderSuccess {
     total: string; // price + 'синапсов' 
 }
+
+/**
+ * @description Интерфейс модального окна
+*/
+interface IModalData {
+    content: HTMLElement;
+}
+
+/**
+ * @description Интерфейс формы
+*/
+interface IFormState {
+    valid: boolean;
+    errors: string[];
+}
+
+/**
+ * @description Интерфейс события
+*/
+interface IProductAPI {
+    getProductList: () => Promise<IProduct[]>
+}
 ```
 
 ## Базовые классы
@@ -208,7 +230,7 @@ events: IEvents; Объект событий
 * `validateOrderContact()` - валидация формы с контактными данными
 
 ## Модели представления
-### Класс `Page`
+### Класс `Page extends Component<IPage>`
 
 Реализует добавление на страницу карточек с товарами, вешает слушатель на иконку корзины и отслеживает колличество товаров в корзине
 Контруктор принимает такие аргументы:
@@ -222,7 +244,7 @@ events: IEvents; Объект событий
 * `set basketCounter(value: number)` - Счетчик количества товаров в корзине
 * `set catalog(items: HTMLElement[])` - Добавление карточкек на главную страницу
 
-### Класс `Card`
+### Класс `Card<T> extends Component<ICard> implements ICard`
 Реализует создание карточки
 Конструктор принимает такие аргументы:
 ```typescript
@@ -236,7 +258,7 @@ actions?: ICardActions; Установка события
 * `set image(value: string)` - Устанавливает изображение
 * `set price(value: number | null)` -Устанавливает цену
 
-### Класс `CardPreview`
+### Класс `CardPreview extends Card<ICardModal> implements ICardPreview`
 Реализует создание  карточки в модальном окне
 Конструктор принимает такие аргументы:
 ```typescript
@@ -248,7 +270,7 @@ actions?: ICardActions; Установка события
 * `set description(value: string)` - Устанавлиет описание
 * `set changeBtnName(value: string)` - Изменяет текст кнопки после добавления товара в корзину
 
-### Класс `Basket`
+### Класс `Basket extends Component<IBasket>`
 Реализует создание корзины
 Контруктор принимает такие аргументы:
 ```typescript
@@ -260,7 +282,7 @@ events: IEvents; Объект событий
 * `set items(items: HTMLElement[])` - Создает список товаров в корзине
 * `set total(value: number)` - Устанавливает общую стоимость товаров
 
-### Класс `BasketItem`
+### Класс `BasketItem extends Basket`
 Реализует создание единицы товара в корзине
 Конструктор принимает такие аргументы:
 ```typescript
@@ -271,7 +293,7 @@ actions?: ICardActions; Установка события
 Класс имеет такие методы:
 * `set index(value: number)` - Устанавливает порядковый номер товара
 
-### Класс `Modal`
+### Класс `Modal extends Component<IModalData>`
 Реализует создание модального окна
 Контруктор принимает такие аргументы:
 ```typescript
@@ -286,7 +308,7 @@ events: IEvents; Объект событий
 * `render(data: IModalData): HTMLElement` - Создает модальное окно с установленным контентом
 
 
-### Класс `Form`
+### Класс `Form extends Component<IFormState>`
 Реализует создание формы
 Контруктор принимает такие аргументы:
 ```typescript
@@ -300,7 +322,7 @@ events: IEvents; Объект событий
 * `onInputChange(field: keyof T, value: string)` - Валидация формы
 * ` render(state: Partial<T> & IFormState)` - Создает окно с формой
 
-### Класс `OrderAdress`
+### Класс `OrderAdress extends Form<IFormAdress>`
 Реализует отображение формы с выбором оплаты и отправкой адресса
 Контруктор принимает такие аргументы:
 ```typescript
@@ -310,7 +332,7 @@ events: IEvents; Объект событий
 
 Класс имеет такие методы:
 
-### Класс `OrderContact`
+### Класс `OrderContact extends Form<IFormContact>`
 Реализует отображение формы с контактнй информацией
 Контруктор принимает такие аргументы:
 ```typescript
@@ -324,7 +346,7 @@ events: IEvents; Объект событий
 * ` set phone(value: string)` - Устанавливает номер телефона
 *  ` set phone(value: string)` - Устанавливает email
 
-### Класс `Success`
+### Класс `Success extends Component<IOrderSuccess>`
 Реализует создание окна об успешном оформлении заказа
 Контруктор принимает такие аргументы:
 ```typescript
@@ -335,7 +357,7 @@ events: IEvents; Объект событий
 Класс имеет такие методы:
 * `set total(total: string)` - Колличесво списаных средсв
 
-### Класс `ProductAPI`
+### Класс `ProductAPI extends Api implements IProductAPI`
 Реализует запросы на определенный API
 Контруктор принимает такие аргументы:
 ```typescript
@@ -347,3 +369,4 @@ options?: RequestInit; //
 Класс имеет такие методы:
 * `getProductList(): Promise<IProduct[]>` - Получает массив с товарами
 * `submittingOrder(value: IOrder): Promise<IOrderResult>` - Отправляет форму с заказом
+
