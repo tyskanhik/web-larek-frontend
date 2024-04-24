@@ -213,7 +213,7 @@ events: IEvents; Объект событий
 * `emitChanges(event: string, payload?: object)` - сообщает всем что модель поменялась
 
 ## Модели данных 
-### Класс `AppState`
+### Класс `AppState extends Model<IProduct>`
 
 Реализует хранение состояния приложения
 
