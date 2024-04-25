@@ -1,8 +1,9 @@
 import { AppState } from './components/AppData';
-import { Card } from './components/Card';
+import { Card, CardPreview } from './components/Card';
 import { Page } from './components/Page';
 import { ProductApi } from './components/ProductApi';
 import { EventEmitter } from './components/base/events';
+import { Modal } from './components/common/Modal';
 import './scss/styles.scss';
 import { ICard, IProduct } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
@@ -11,7 +12,7 @@ import { cloneTemplate, ensureElement } from './utils/utils';
 
 const DOM = {
     templateGaleryItem: ensureElement<HTMLTemplateElement>('#card-catalog'),
-    templateModalCard: ensureElement<HTMLTemplateElement>('#card-preview'),
+    templatePreviewCard: ensureElement<HTMLTemplateElement>('#card-preview'),
     temlateBasket: ensureElement<HTMLTemplateElement>('#basket'),
     templateBusketItem: ensureElement<HTMLTemplateElement>('#card-basket'),
     templateOrderAdress: ensureElement<HTMLTemplateElement>('#order'),
@@ -20,10 +21,11 @@ const DOM = {
 
 const api = new ProductApi(CDN_URL, API_URL);
 const events = new EventEmitter();
-const appData = new AppState({}, events)
+const appData = new AppState({}, events);
 
 
-const page = new Page(document.body, events)
+const page = new Page(document.body, events);
+const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 
 
 events.on('items:chenges', () => {
@@ -40,7 +42,24 @@ events.on('items:chenges', () => {
     })
 })
 
+events.on('card:select', (item: IProduct) => {
+    const cardPreciew = new CardPreview(cloneTemplate(DOM.templatePreviewCard), {
+        onClick: () => events.emit('add-basket:select', item)
+    })
+    
+    if(!item.price) {
+        cardPreciew.disabled = true
+    }
 
+    return modal.render({
+        content: cardPreciew.render({
+            category: item.category,
+            image: item.image,
+            description: item.description,
+            price: item.price
+        })
+    })
+})
 
 api.getProductList()
     .then(appData.setCatalog.bind(appData))
