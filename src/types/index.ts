@@ -6,7 +6,7 @@ export type FormErrors = Partial<Record<keyof IOrder, string>>;
 /**
  * @description Интерфейс продукта поторый приходит с сервера
 */
-interface IProduct {
+export interface IProduct {
     id: string;
     description: string;
     image: string;
@@ -18,7 +18,7 @@ interface IProduct {
 /**
  * @description интерфейс карточки с продуктом
  */
-interface ICard {
+export interface ICard {
     category: string;
     title: string;
     image: string;
@@ -28,14 +28,14 @@ interface ICard {
 /**
  * @descriptions Интерфейс превью карточки
 */
-interface ICardPreview extends ICard {
+export interface ICardPreview extends ICard {
     description: string
 }
 
 /**
  * @description интерфейс корзины
 */
-interface IBasket {
+export interface IBasket {
     items: HTMLElement[];
     total: string; // price + ' синопсов'
 }
@@ -43,7 +43,7 @@ interface IBasket {
 /**
  * @description интерфейс единицы товара в корзине
  */
-interface IBasketCard {
+export interface IBasketCard {
     index: number;
     title: string;
     price: string; // price + ' синопсов'
@@ -52,7 +52,7 @@ interface IBasketCard {
 /**
  * @description интерфейс формы с адрессом доставки и способом оплаты
  */
-interface IFormAdress {
+export interface IFormAdress {
     payment: 'Онлайн' | 'При получении';
     adress: string;
 }
@@ -60,7 +60,7 @@ interface IFormAdress {
 /**
  * @description интерфейс формы с контактными данными
  */
-interface IFormContact {
+export interface IFormContact {
     email: string;
     phone: string; 
 }
@@ -68,7 +68,7 @@ interface IFormContact {
 /**
  * @description интерфейс с заказом
  */
-interface IOrder extends IFormContact, IFormAdress {
+export interface IOrder extends IFormContact, IFormAdress {
     items: string[],
     total: number
 }
@@ -76,21 +76,21 @@ interface IOrder extends IFormContact, IFormAdress {
 /**
  * @description интерфейс формы после успешной покупки
  */
-interface IOrderSuccess {
+export interface IOrderSuccess {
     total: string; // price + 'синапсов' 
 }
 
 /**
  * @description Интерфейс модального окна
 */
-interface IModalData {
+export interface IModalData {
     content: HTMLElement;
 }
 
 /**
  * @description Интерфейс формы
 */
-interface IFormState {
+export interface IFormState {
     valid: boolean;
     errors: string[];
 }
@@ -98,6 +98,6 @@ interface IFormState {
 /**
  * @description Интерфейс события
 */
-interface IProductAPI {
+export interface IProductAPI {
     getProductList: () => Promise<IProduct[]>
 }
