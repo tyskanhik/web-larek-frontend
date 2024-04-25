@@ -22,7 +22,7 @@ export interface ICard {
     category: string;
     title: string;
     image: string;
-    price: string; // price + ' синопсов'
+    price: price;
 }
 
 /**
