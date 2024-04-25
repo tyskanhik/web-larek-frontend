@@ -1,13 +1,14 @@
+import './scss/styles.scss';
 import { AppState } from './components/AppData';
 import { Card, CardPreview } from './components/Card';
 import { Page } from './components/Page';
 import { ProductApi } from './components/ProductApi';
 import { EventEmitter } from './components/base/events';
 import { Modal } from './components/common/Modal';
-import './scss/styles.scss';
 import { ICard, IProduct } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
 import { cloneTemplate, ensureElement } from './utils/utils';
+import { Basket } from './components/Basket';
 
 
 const DOM = {
@@ -26,6 +27,7 @@ const appData = new AppState({}, events);
 
 const page = new Page(document.body, events);
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
+const basket = new Basket(cloneTemplate(DOM.temlateBasket), events);
 
 
 events.on('items:chenges', () => {
@@ -61,7 +63,11 @@ events.on('card:select', (item: IProduct) => {
     })
 })
 
-
+events.on('bids:open', () => {
+    return modal.render({
+        content: basket.render()
+    })
+})
 
 
 // Блокируем прокрутку страницы если открыта модалка

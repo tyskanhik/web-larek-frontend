@@ -45,7 +45,7 @@ export interface IAppState {
 */
 export interface IBasket {
     items: HTMLElement[];
-    total: string; // price + ' синопсов'
+    total: price; 
 }
 
 /**
