@@ -31,6 +31,10 @@ export class Basket<T> extends Component<T> implements IBasket {
     set total(value: string) {
         this.setText(this._total, value)
     }
+
+    set disabled(value: boolean) {
+        this.setDisabled(this._button, value)
+    }
 }
 
 export class BasketItem extends Card<IBasketCard> implements IBasketCard {

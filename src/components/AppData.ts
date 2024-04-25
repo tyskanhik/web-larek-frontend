@@ -24,4 +24,8 @@ export class AppState extends Model<IAppState> {
     get total() {
         return this._total;  
     }
+
+    removeItem(item: IProduct) {
+        this.basket = this.basket.filter(element => element !== item);
+    }
 }

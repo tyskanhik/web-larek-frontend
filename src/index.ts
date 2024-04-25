@@ -78,6 +78,10 @@ events.on('add-basket:select', (item: IProduct) => {
 })
 
 events.on('bids:open', () => {
+    appData.basket.length ?
+        basket.disabled = false :
+        basket.disabled = true
+
     let counter: number = 0;
     basket.items = appData.basket.map(item => {
         const card = new BasketItem(cloneTemplate(DOM.templateBusketItem), {
@@ -94,11 +98,40 @@ events.on('bids:open', () => {
 
     return modal.render({
         content: basket.render({
-            total: appData.total + ' синапсов'
+            total: `${appData.total} синапсов`
         })
     })
 })
 
+events.on('card:remove', (item: IProduct) => {
+    appData.removeItem(item)
+    page.basketCounter = appData.basket.length;
+    appData.total = -item.price
+    
+    let counter: number = 0;
+    basket.items = appData.basket.map(item => {
+        const card = new BasketItem(cloneTemplate(DOM.templateBusketItem), {
+            onClick: () => events.emit('card:remove', item)
+        })
+
+        counter++;
+        return card.render({
+            index: counter,
+            title: item.title,
+            price: item.price
+        })
+    })
+
+    appData.basket.length ?
+    basket.disabled = false :
+    basket.disabled = true
+    
+    return modal.render({
+        content: basket.render({
+            total: `${appData.total} синапсов`
+        })
+    })
+})
 
 // Блокируем прокрутку страницы если открыта модалка
 events.on('modal:open', () => {
