@@ -61,6 +61,19 @@ events.on('card:select', (item: IProduct) => {
     })
 })
 
+
+
+
+// Блокируем прокрутку страницы если открыта модалка
+events.on('modal:open', () => {
+    page.locked = true;
+});
+
+// ... и разблокируем
+events.on('modal:close', () => {
+    page.locked = false;
+});
+
 api.getProductList()
     .then(appData.setCatalog.bind(appData))
     .catch(err => console.log(err))
