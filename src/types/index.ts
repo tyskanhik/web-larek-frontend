@@ -33,6 +33,14 @@ export interface ICardPreview extends ICard {
 }
 
 /**
+ * @description интерфейс магазина
+ */
+export interface IAppState {
+    catalog: IProduct[];
+    basket: string[];
+}
+
+/**
  * @description интерфейс корзины
 */
 export interface IBasket {
