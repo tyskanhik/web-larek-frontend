@@ -1,10 +1,11 @@
-import { IBasket } from "../types";
+import { IBasket, IBasketCard } from "../types";
 import { ensureElement } from "../utils/utils";
+import { Card, ICardActions } from "./Card";
 import { Component } from "./base/Component";
 import { EventEmitter } from "./base/events";
 
 
-export class Basket extends Component<IBasket> implements IBasket {
+export class Basket<T> extends Component<T> implements IBasket {
     protected _list: HTMLElement;
 	protected _total: HTMLElement;
 	protected _button: HTMLElement;
@@ -27,7 +28,25 @@ export class Basket extends Component<IBasket> implements IBasket {
         }
     }
 
-    set total(value: number) {
+    set total(value: string) {
         this.setText(this._total, value)
+    }
+}
+
+export class BasketItem extends Card<IBasketCard> implements IBasketCard {
+    protected _index: HTMLSpanElement;
+    protected _deleteBtn: HTMLButtonElement;
+
+    constructor(container: HTMLElement,  actions?: ICardActions) {
+        super(container)
+
+        this._index = container.querySelector('.basket__item-index');
+        this._deleteBtn = container.querySelector('.basket__item-delete');
+
+        this._deleteBtn.addEventListener('click', actions.onClick)
+    }
+
+    set index(value: number) {
+        this.setText(this._index, value)
     }
 }

@@ -8,7 +8,7 @@ import { Modal } from './components/common/Modal';
 import { ICard, IProduct } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
 import { cloneTemplate, ensureElement } from './utils/utils';
-import { Basket } from './components/Basket';
+import { Basket, BasketItem } from './components/Basket';
 
 
 const DOM = {
@@ -53,6 +53,11 @@ events.on('card:select', (item: IProduct) => {
         cardPreciew.disabled = true
     }
 
+    if(appData.basket.includes(item)) {
+        cardPreciew.changeBtnName = 'Уже в корзизе';
+        cardPreciew.disabled = true;
+    }
+
     return modal.render({
         content: cardPreciew.render({
             category: item.category,
@@ -63,9 +68,34 @@ events.on('card:select', (item: IProduct) => {
     })
 })
 
+events.on('add-basket:select', (item: IProduct) => {
+    appData.basket.push(item);
+    modal.close();
+    page.basketCounter = appData.basket.length;
+    appData.total = item.price;
+    console.log(appData.total);
+    
+})
+
 events.on('bids:open', () => {
+    let counter: number = 0;
+    basket.items = appData.basket.map(item => {
+        const card = new BasketItem(cloneTemplate(DOM.templateBusketItem), {
+            onClick: () => events.emit('card:remove', item)
+        })
+
+        counter++;
+        return card.render({
+            index: counter,
+            title: item.title,
+            price: item.price
+        })
+    })
+
     return modal.render({
-        content: basket.render()
+        content: basket.render({
+            total: appData.total + ' синапсов'
+        })
     })
 })
 
