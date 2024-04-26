@@ -1,6 +1,7 @@
 export type price = number | null;
 export type category = 'софт-скил' | 'другое' | 'дополнительное' | 'кнопка' | 'хард-скил'
 export type FormErrors = Partial<Record<keyof IOrder, string>>;
+export type payment = 'Онлайн' | 'При получении';
 
 
 /**
@@ -61,8 +62,8 @@ export interface IBasketCard {
  * @description интерфейс формы с адрессом доставки и способом оплаты
  */
 export interface IFormAdress {
-    payment: 'Онлайн' | 'При получении';
-    adress: string;
+    payment: payment;
+    address: string;
 }
 
 /**

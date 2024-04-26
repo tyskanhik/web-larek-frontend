@@ -5,10 +5,11 @@ import { Page } from './components/Page';
 import { ProductApi } from './components/ProductApi';
 import { EventEmitter } from './components/base/events';
 import { Modal } from './components/common/Modal';
-import { ICard, IProduct } from './types';
+import { ICard, IFormAdress, IFormContact, IProduct, payment } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { Basket, BasketItem } from './components/Basket';
+import { OrderAddress, OrderContact } from './components/Order';
 
 
 const DOM = {
@@ -28,7 +29,8 @@ const appData = new AppState({}, events);
 const page = new Page(document.body, events);
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 const basket = new Basket(cloneTemplate(DOM.temlateBasket), events);
-
+const orderAdress = new OrderAddress(cloneTemplate(DOM.templateOrderAdress), events);
+const orderContact = new OrderContact(cloneTemplate(DOM.templateOrderContact), events);
 
 events.on('items:chenges', () => {
     page.catalog = appData.catalog.map((item: IProduct) => {
@@ -70,11 +72,10 @@ events.on('card:select', (item: IProduct) => {
 
 events.on('add-basket:select', (item: IProduct) => {
     appData.basket.push(item);
+    appData.order.items.push(item.id)
     modal.close();
     page.basketCounter = appData.basket.length;
     appData.total = item.price;
-    console.log(appData.total);
-    
 })
 
 events.on('bids:open', () => {
@@ -128,10 +129,62 @@ events.on('card:remove', (item: IProduct) => {
     
     return modal.render({
         content: basket.render({
-            total: `${appData.total} синапсов`
+            total: `${appData.order.total} синапсов`
         })
     })
 })
+
+events.on('order:open', () => {
+    modal.render({
+        content: orderAdress.render({
+            address: '',
+            payment: 'Онлайн',
+            valid: false,
+            errors: []
+        })
+    })
+})
+events.on('selection:card', () => {
+    appData.order.payment = 'Онлайн';
+    orderAdress.payment = appData.order.payment;
+})
+events.on('selection:cash', () => {
+    appData.order.payment = 'При получении';
+    orderAdress.payment = appData.order.payment;
+})
+events.on(/^order\..*:change/, (data: { field: keyof IFormAdress, value: payment }) => {
+    appData.setOrderAdress(data.field, data.value);
+    appData.order.items
+});
+events.on('formErrors:change', (errors: Partial<IFormAdress>) => {
+    const { address } = errors;
+    orderAdress.valid = !address;
+    orderAdress.errors = Object.values({ address }).filter(i => !!i).join('; ');   
+});
+
+
+
+events.on('order:submit', () => {
+    modal.render({
+        content: orderContact.render({
+            phone: '',
+            email: '',
+            valid: false,
+            errors: []
+        })
+    })
+})
+events.on(/^contacts\..*:change/, (data: { field: keyof IFormContact, value: string }) => {
+    appData.setOrderContact(data.field, data.value);
+    appData.order.items
+});
+events.on('formErrors:change', (errors: Partial<IFormContact>) => {
+    const { email, phone } = errors;
+    orderContact.valid = !phone && !email;
+    orderContact.errors = Object.values({ email, phone }).filter(i => !!i).join('; ');   
+});
+
+
 
 // Блокируем прокрутку страницы если открыта модалка
 events.on('modal:open', () => {
