@@ -3,14 +3,13 @@ import { Component } from "./base/Component";
 import { IEvents } from "./base/events";
 
 
-
 export interface IPage {
     catalog: HTMLElement[];
     basketCounter: number;
     locked: boolean
 }
 
-export class Page extends Component<IPage> {
+export class Page extends Component<IPage> implements IPage {
     protected _catalog: HTMLElement;
     protected _basket: HTMLElement;
     protected _basketCounter: HTMLSpanElement;

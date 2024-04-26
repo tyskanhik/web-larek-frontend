@@ -3,7 +3,8 @@ import { ensureElement } from "../../utils/utils";
 import { Component } from "../base/Component";
 import { IEvents } from "../base/events";
 
-export class Form<T> extends Component<IFormState> {
+
+export class Form<T> extends Component<IFormState> implements IFormState {
     protected _submit: HTMLButtonElement;
     protected _errors: HTMLElement;
 
@@ -26,8 +27,6 @@ export class Form<T> extends Component<IFormState> {
             this.events.emit(`${this.container.name}:submit`);
         });
     }
-
-    
 
     protected onInputChange(field: keyof T, value: string) {
         this.events.emit(`${this.container.name}.${String(field)}:change`, {

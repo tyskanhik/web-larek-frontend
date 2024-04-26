@@ -38,7 +38,7 @@ export interface ICardPreview extends ICard {
  */
 export interface IAppState {
     catalog: IProduct[];
-    basket: string[];
+    basket: IProduct[];
 }
 
 /**
@@ -101,7 +101,7 @@ export interface IModalData {
 */
 export interface IFormState {
     valid: boolean;
-    errors: string[];
+    errors: string[] | string;
 }
 
 /**

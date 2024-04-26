@@ -1,5 +1,4 @@
 import { IFormAdress, IFormContact, payment } from "../types";
-import { ICardActions } from "./Card";
 import { IEvents } from "./base/events";
 import { Form } from "./common/Form";
 

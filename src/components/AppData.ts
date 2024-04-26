@@ -2,12 +2,11 @@ import { FormErrors, IAppState, IFormAdress, IFormContact, IOrder, IProduct, pay
 import { Model } from "./base/Model"
 
 
-
 export type CatalogChangeEvent = {
     catalog: IProduct[]
 }
 
-export class AppState extends Model<IAppState> {
+export class AppState extends Model<IAppState> implements IAppState {
     catalog: IProduct[];
     basket: IProduct[] = [];
     order: IOrder = {
@@ -22,7 +21,7 @@ export class AppState extends Model<IAppState> {
 
     setCatalog(items: IProduct[]) {
         this.catalog = items;
-        this.emitChanges('items:chenges', {catalog: this.catalog})
+        this.emitChanges('items:chenges', { catalog: this.catalog })
     }
 
     set total(value: number) {
@@ -30,7 +29,7 @@ export class AppState extends Model<IAppState> {
     }
 
     get total() {
-        return this.order.total;  
+        return this.order.total;
     }
 
     removeItem(item: IProduct) {
@@ -38,16 +37,31 @@ export class AppState extends Model<IAppState> {
         this.order.items = this.order.items.filter(element => element !== item.id);
     }
 
+    clearBasket() {
+        this.basket = [];
+    }
+
+    clearOrder() {
+        this.order = {
+            items: [],
+            total: 0,
+            email: '',
+            phone: '',
+            payment: 'Онлайн',
+            address: ''
+        }
+    }
+
     setOrderAdress(field: keyof IFormAdress, value: payment) {
         this.order[field] = value;
 
         if (this.validateOrderAdress()) {
             this.events.emit('order:ready', this.order);
-        }   
+        }
     }
     validateOrderAdress() {
         const errors: typeof this.formErrors = {};
-        
+
         if (!this.order.address) {
             errors.address = 'Необходимо указать адресс';
         }
@@ -61,11 +75,11 @@ export class AppState extends Model<IAppState> {
 
         if (this.validateOrderContact()) {
             this.events.emit('order:ready', this.order);
-        }   
+        }
     }
     validateOrderContact() {
         const errors: typeof this.formErrors = {};
-        
+
         if (!this.order.email) {
             errors.email = 'Необходимо указать email';
         }

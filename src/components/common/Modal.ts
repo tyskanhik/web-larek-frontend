@@ -4,7 +4,7 @@ import { Component } from "../base/Component";
 import { IEvents } from "../base/events";
 
 
-export class Modal extends Component<IModalData> {
+export class Modal extends Component<IModalData> implements IModalData {
     protected _closeButton: HTMLButtonElement;
     protected _content: HTMLElement;
 

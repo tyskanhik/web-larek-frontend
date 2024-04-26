@@ -1,6 +1,11 @@
-import { IProduct, IProductAPI } from "../types";
+import { IOrder, IProduct, IProductAPI } from "../types";
 import { Api, ApiListResponse } from "./base/api";
 
+
+export interface IOrderApi {
+    id: string,
+    total: number
+}
 
 export class ProductApi extends Api implements IProductAPI {
     readonly cdn: string;
@@ -18,5 +23,11 @@ export class ProductApi extends Api implements IProductAPI {
                     image: this.cdn + item.image
                 }))
             )
+    }
+
+    sendOrder(value: IOrder): Promise<IOrderApi> {
+        return this.post('/order', value).then(
+            (data: IOrderApi) => data
+        );
     }
 }
