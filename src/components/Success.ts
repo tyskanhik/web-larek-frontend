@@ -7,8 +7,8 @@ export interface ISuccess {
 }
 
 export class Success extends Component<ISuccess> implements ISuccess {
-    protected _total: HTMLElement;
     protected _close: HTMLElement;
+    protected _total: HTMLElement;
 
     constructor(container: HTMLElement, actions?: ICardActions) {
         super(container);

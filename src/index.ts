@@ -9,7 +9,7 @@ import { ICard, IFormAdress, IFormContact, IProduct, payment } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { Basket, BasketItem } from './components/Basket';
-import { OrderAddress, OrderContact } from './components/Order';
+import { OrderAddress, OrderContact, pay } from './components/Order';
 import { Success } from './components/Success';
 
 /**
@@ -64,7 +64,7 @@ events.on('card:select', (item: IProduct) => {
         cardPreciew.disabled = true
     }
 
-    if (appData.basket.includes(item)) {
+    if (appData.includesBasketItem(item)) {
         cardPreciew.changeBtnName = 'Уже в корзизе';
         cardPreciew.disabled = true;
     }
@@ -80,17 +80,6 @@ events.on('card:select', (item: IProduct) => {
 })
 
 /**
- * Добавления товара в корзину
- */
-events.on('add-basket:select', (item: IProduct) => {
-    appData.basket.push(item);
-    appData.order.items.push(item.id)
-    modal.close();
-    page.basketCounter = appData.basket.length;
-    appData.total = item.price;
-})
-
-/**
  * Открытие корзины
  */
 events.on('bids:open', () => {
@@ -98,25 +87,22 @@ events.on('bids:open', () => {
         basket.disabled = false :
         basket.disabled = true
 
-    let counter: number = 0;
-    basket.items = appData.basket.map(item => {
-        const card = new BasketItem(cloneTemplate(DOM.templateBusketItem), {
-            onClick: () => events.emit('card:remove', item)
-        })
-
-        counter++;
-        return card.render({
-            index: counter,
-            title: item.title,
-            price: item.price
-        })
-    })
-
     return modal.render({
         content: basket.render({
-            total: `${appData.total} синапсов`
+            total: `${appData.order.total} синапсов`
         })
     })
+})
+
+/**
+ * Добавления товара в корзину
+ */
+events.on('add-basket:select', (item: IProduct) => {
+    appData.addBasket(item);
+    modal.close();
+    page.basketCounter = appData.basket.length;
+
+    events.emit('basketItem:change', item);
 })
 
 /**
@@ -125,8 +111,24 @@ events.on('bids:open', () => {
 events.on('card:remove', (item: IProduct) => {
     appData.removeItem(item)
     page.basketCounter = appData.basket.length;
-    appData.total = -item.price
 
+    events.emit('basketItem:change', item);
+
+    appData.basket.length ?
+        basket.disabled = false :
+        basket.disabled = true
+
+    return modal.render({
+        content: basket.render({
+            total: `${appData.order.total} синапсов`
+        })
+    })
+})
+
+/**
+ * Изменение товаров в корзине
+ */
+events.on('basketItem:change', () => {
     let counter: number = 0;
     basket.items = appData.basket.map(item => {
         const card = new BasketItem(cloneTemplate(DOM.templateBusketItem), {
@@ -138,16 +140,6 @@ events.on('card:remove', (item: IProduct) => {
             index: counter,
             title: item.title,
             price: item.price
-        })
-    })
-
-    appData.basket.length ?
-        basket.disabled = false :
-        basket.disabled = true
-
-    return modal.render({
-        content: basket.render({
-            total: `${appData.order.total} синапсов`
         })
     })
 })
@@ -165,19 +157,19 @@ events.on('order:open', () => {
         })
     })
 })
+
 /**
- * Выбор оплаты 'Оналйн'
+ * Выбор оплаты
  */
-events.on('selection:card', () => {
-    appData.order.payment = 'Онлайн';
-    orderAddress.payment = appData.order.payment;
-})
-/**
- * Выбор оплаты 'При получении'
- */
-events.on('selection:cash', () => {
-    appData.order.payment = 'При получении';
-    orderAddress.payment = appData.order.payment;
+events.on('selection:payment', (pay: pay) => {
+    console.log(pay.payment === 'Онлайн');
+    if(pay.payment === 'Онлайн') {
+        appData.order.payment = 'Онлайн';
+        orderAddress.payment = appData.order.payment;
+    } else {
+        appData.order.payment = 'При получении';
+        orderAddress.payment = appData.order.payment;
+    }
 })
 events.on(/^order\..*:change/, (data: { field: keyof IFormAdress, value: payment }) => {
     appData.setOrderAdress(data.field, data.value);
@@ -216,12 +208,14 @@ events.on('formErrors:change', (errors: Partial<IFormContact>) => {
  * Отправка заказа, открытие модльного окна с успешным оформлением заказа и обнуление объектов корзины и заказа
  */
 events.on('contacts:submit', () => {
-    const success = new Success(cloneTemplate(DOM.templateSuccess), {
-        onClick: () => modal.close()
-    })
-
+    appData.setOrderItems();
+    
     api.sendOrder(appData.order)
-        .then(res => {
+    .then(res => {
+            const success = new Success(cloneTemplate(DOM.templateSuccess), {
+                onClick: () => modal.close()
+            })
+
             appData.clearBasket();
             appData.clearOrder();
             page.basketCounter = 0;
@@ -231,6 +225,7 @@ events.on('contacts:submit', () => {
                 })
             })
         })
+        .catch(err => console.log(err));
 })
 
 /**

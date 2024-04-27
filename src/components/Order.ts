@@ -2,6 +2,9 @@ import { IFormAdress, IFormContact, payment } from "../types";
 import { IEvents } from "./base/events";
 import { Form } from "./common/Form";
 
+export interface pay {
+    payment: 'Онлайн' | 'При получении'
+}
 
 export class OrderAddress extends Form<IFormAdress> implements IFormAdress{
     protected _card: HTMLElement;
@@ -13,8 +16,14 @@ export class OrderAddress extends Form<IFormAdress> implements IFormAdress{
         this._card = container.querySelector('[name="card"]');
         this._cash = container.querySelector('[name="cash"]');
 
-        this._card.addEventListener('click', () => events.emit('selection:card'));
-        this._cash.addEventListener('click', () => events.emit('selection:cash'));
+        this._card.addEventListener('click', () =>{
+            const card: pay = {payment: 'Онлайн'};
+            events.emit(('selection:payment'), card);
+        })
+        this._cash.addEventListener('click', () => {
+            const cash:pay = {payment: 'При получении'}
+            events.emit('selection:payment', cash);
+        })
     }
 
     set payment(value: payment) {

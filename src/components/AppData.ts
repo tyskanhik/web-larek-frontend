@@ -24,17 +24,22 @@ export class AppState extends Model<IAppState> implements IAppState {
         this.emitChanges('items:chenges', { catalog: this.catalog })
     }
 
-    set total(value: number) {
-        this.order.total += value;
+    includesBasketItem(item: IProduct) {
+        return this.basket.includes(item)
     }
-
-    get total() {
-        return this.order.total;
+    
+    addBasket(item: IProduct) {
+        this.basket.push(item);
+        this.order.total += item.price
     }
 
     removeItem(item: IProduct) {
         this.basket = this.basket.filter(element => element !== item);
-        this.order.items = this.order.items.filter(element => element !== item.id);
+        this.order.total += -item.price
+    }
+
+    setOrderItems() {
+        this.order.items = this.basket.map(el => el.id)
     }
 
     clearBasket() {

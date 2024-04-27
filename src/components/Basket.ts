@@ -1,4 +1,4 @@
-import { IBasket, IBasketCard } from "../types";
+import { IBasket, IBasketCard, IProduct } from "../types";
 import { ensureElement } from "../utils/utils";
 import { Card, ICardActions } from "./Card";
 import { Component } from "./base/Component";
